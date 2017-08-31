@@ -1,0 +1,72 @@
+﻿<!DOCTYPE html>
+<html>
+    <head>
+        <title> </title>
+        <script type="text/javascript">
+            window.onload=function(){
+                //写入
+                var oneInner = document.createElement("div");
+                oneInner.setAttribute("style","background:#663398;position:absolute;width:100px;height:100px;border:solid 3px #2F74A7;cursor:pointer;");
+                var oneButton = document.createElement("input");
+                oneButton.setAttribute("type","button");
+                oneButton.setAttribute("value","x");
+                if (oneButton.style.cssFloat)
+                {
+                    oneButton.style.cssFloat="right"
+                }
+                else
+                {oneButton.style.styleFloat="right"}
+                oneInner.appendChild(oneButton);
+                document.body.appendChild(oneInner);
+
+                //定时器
+                var a1a = setInterval(moves,10);
+                //函数
+ 
+
+                var x = 1;
+                var y = 1;
+
+                function moves(){
+                    var tops = oneInner.offsetTop
+                    var lefts = oneInner.offsetLeft
+
+                    if (lefts>=document.documentElement.clientWidth-oneInner.offsetWidth||lefts<=0)
+                    {
+                        x=-x
+                    }
+
+                    if (tops>=document.documentElement.clientHeight-oneInner.offsetHeight||tops<=0)
+                    {
+                        y=-y
+                    }
+
+                    tops+=y;
+                    lefts+=x;
+
+                    oneInner.style.top=tops+"px"
+                    oneInner.style.left=lefts+"px"
+                }
+
+                //悬停停止
+                oneInner.onmouseover=function(){
+                    clearInterval(a1a);
+                }
+                //放手继续运动
+                oneInner.onmouseout=function(){
+                    a1a =setInterval(moves,10);
+                }
+                //删除
+                oneButton.onclick=function(){
+                    document.body.removeChild(oneInner);
+                }
+            }
+        </script>
+
+    </head>
+
+    <body>
+
+
+    </body>
+</html>

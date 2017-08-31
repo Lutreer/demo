@@ -1,0 +1,74 @@
+﻿<!DOCTYPE HTML>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>js实现选项卡（三种方法）</title>
+<style>
+#div1 div{ width:200px; height:200px; border:1px #000 solid; display:none;}
+.active{ background:red;}
+</style>
+<script>
+
+ window.onload = function(){
+	var oParent = document.getElementById('div1');
+	var aInput = oParent.getElementsByTagName('input');
+	var aDiv = oParent.getElementsByTagName('div');
+	
+	//方法一（自定义index为当前点击）
+	/*for(var i=0;i<aInput.length;i++){
+		aInput[i].index = i;
+		aInput[i].onclick = function(){
+			for(var i=0;i<aInput.length;i++){
+				aInput[i].className = '';
+				aDiv[i].style.display = 'none';
+			}
+			this.className = 'active';
+			aDiv[this.index].style.display = 'block';
+		};
+	}*/
+	
+	//方法二（采用立即执行函数）：
+	/*for(var i=0;i<aInput.length;i++){
+		 (function(i){
+			aInput[i].onclick = function(){
+				for( var j=0;j<aDiv.length;j++){
+					aInput[j].className = " ";
+					aDiv[j].style.display = "none";
+				}
+					aInput[i].className = "active ";
+					aDiv[i].style.display = "block";
+			};
+		 })(i); 
+	};*/
+	
+	//方法三（for循环+if判断当前点击与自定义数组是否匹配）
+	for(var i=0;i<aInput.length;i++){
+		aInput[i].onclick = function(){
+			for( var j=0;j<aDiv.length;j++){
+				aInput[j].className = " ";
+				aDiv[j].style.display = "none";
+				this.className = "active ";
+				if(this == aInput[j]) {  //判断当前点击是按钮数组中的哪一个？ 
+					aDiv[j].style.display = "block";
+				} 
+			};
+		};	
+	};
+	
+}; 
+
+ 
+</script>
+</head>
+
+<body>
+<div id="div1">
+	<input class="active" type="button" value="1">
+    <input type="button" value="2">
+    <input type="button" value="3">
+    <div style="display:block">11111</div>
+    <div>22222</div>
+    <div>33333</div>
+</div>
+</body>
+</html>
