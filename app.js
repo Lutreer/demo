@@ -1,69 +1,32 @@
 const Koa = require('koa')
-const app = new Koa()
-const views = require('koa-views')
-const json = require('koa-json')
-const onerror = require('koa-onerror')
-const bodyparser = require('koa-bodyparser')
-const logger = require('koa-logger')
+const app =  new Koa();
 
-// 一、引入session和redis中间件
-const session = require('koa-generic-session')
-const Redis = require('koa-redis')
+const Router = require('koa-router') // koa路由中间件
 
-const pv = require('./middleware/koa-pv')
+const router = new Router({
+  prefix: '/api'
+}) // 父路由, 给路由统一加个前缀 /api
 
-// 一、引入mongoose
-const mongoose = require('mongoose')
-const dbConfig = require('./dbs/config')
+const bodyParser = require('koa-bodyparser') // 处理post请求，把 koa2 上下文的表单数据解析到 ctx.request.body 中
+app.use(bodyParser())
+
+// 引入数据库操作方法
+const UserController = require('./server/controller/users.js')
+
+// 路由,访问：http://localhost:3333/api/save
+router.get('/save', UserController.saveUser)
+router.get('/create', UserController.createUser)
+router.get('/find', UserController.findUser)
+router.get('/findall', UserController.findAllUser)
+router.get('/update', UserController.updateUser)
+router.get('/remove', UserController.removeUser)
 
 
-const index = require('./routes/index')
-const users = require('./routes/users')
+// 加载路由中间件
+app.use(router.routes())
+// allowedMethods 处理的业务是当所有路由中间件执行完成之后,若ctx.status为空或者404的时候,丰富response对象的header头
+app.use(router.allowedMethods())
 
-// error handler
-onerror(app)
-
-// 二、连接redis
-app.keys = ['keys', 'keyskeys'] // 给 session 用作加密处理
-app.use(session({
-  key: 'mt',
-  prefix: 'mtpr',
-  store: new Redis() // 存储到store
-}))
-
-// middlewares
-app.use(bodyparser({
-  enableTypes:['json', 'form', 'text']
-}))
-app.use(json())
-app.use(logger())
-app.use(require('koa-static')(__dirname + '/public'))
-
-app.use(views(__dirname + '/views', {
-  extension: 'ejs'
-}))
-
-app.use(pv())
-// logger
-app.use(async (ctx, next) => {
-  const start = new Date()
-  await next()
-  const ms = new Date() - start
-  console.log(`${ctx.method} ${ctx.url} - ${ms}ms`)
+app.listen(3333, () => {
+  console.log('This server is running at http://localhost:' + 3333)
 })
-
-// routes
-app.use(index.routes(), index.allowedMethods())
-app.use(users.routes(), users.allowedMethods())
-
-// 二、 连接数据库的服务
-mongoose.connect(dbConfig.dbs, {
-  useNewUrlParser: true
-})
-
-// error-handling
-app.on('error', (err, ctx) => {
-  console.error('server error', err, ctx)
-});
-
-module.exports = app
